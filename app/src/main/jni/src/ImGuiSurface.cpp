@@ -66,9 +66,7 @@ Java_akn_main_ImGuiSurface_SurfaceChanged(JNIEnv *env, jclass clazz, jobject gl,
 
     glViewport(0, 0, width, height);
     ImGuiIO &io = ImGui::GetIO();
-    io.ConfigWindowsMoveFromTitleBarOnly = false;
-    io.IniFilename = NULL;
-	ImGui::GetIO().DisplaySize = ImVec2((float)width, (float)height);
+    io.DisplaySize = ImVec2((float)width, (float)height);
 }
 extern "C"
 JNIEXPORT void JNICALL
