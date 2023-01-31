@@ -1,0 +1,9 @@
+.gradle
+.idea
+app/build
+*.apk
+*.o
+*.so
+local.properties
+.cache
+app/src/main/obj/*/*/*
