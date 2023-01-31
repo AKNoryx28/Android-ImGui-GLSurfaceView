@@ -13,5 +13,5 @@ const/4 v0, 0x1
 invoke-static {v0}, Lakn/main/Main;->setVisible(Z)V
 
 # onDestroy
-invoke-static {}, Lakn/main/IMGUIView;->tryShutdown()V
+invoke-static {}, Lakn/main/ImGuiSurface;->tryShutdown()V
 ```
