@@ -1,7 +1,7 @@
 ## In your game MainActivity
 ```smali
 # onCreate
-invoke-static {p0}, Lakn/main/FloatingTool;->RequestOverlayPermission(Landroid/app/Activity;)V
+invoke-static {p0}, Lakn/main/Main;->RequestOverlayPermission(Landroid/app/Activity;)V
 invoke-static {p0}, Lakn/main/Main;->Start(Landroid/content/Context;)V
 
 # onPause
