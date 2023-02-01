@@ -1,10 +1,12 @@
 package akn.main;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.PixelFormat;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.Surface;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -122,11 +124,17 @@ public class ImGuiSurface extends GLSurfaceView implements GLSurfaceView.Rendere
             Shutdown();
     }
 
+    @SuppressLint("ClickableViewAccessibility")
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        MotionEvent(event);
+        return super.onTouchEvent(event);
+    }
+
     public static native void Init(AssetManager assetMgr, Surface surface);
     public static native boolean Initialized();
     public static native void SurfaceChanged(GL10 gl, int width, int height);
     public static native void Tick();
     public static native void Shutdown();
-    public static native void MotionEventClick(boolean down,float PosX,float PosY);
-    public static native String GetWindowCurrent();
+    public static native void MotionEvent(MotionEvent event);
 }

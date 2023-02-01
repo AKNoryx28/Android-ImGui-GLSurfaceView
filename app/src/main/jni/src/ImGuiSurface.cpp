@@ -85,6 +85,7 @@ Java_akn_main_ImGuiSurface_Tick(JNIEnv *env, jclass clazz) {
     g_CurrentWindow = ImGui::GetCurrentWindow();
     ImGui::End();
 
+    ImGui::ShowDemoWindow();
 
     ImGui::Render();
     glViewport(0, 0, screenWidth, screenHeight);
@@ -105,25 +106,26 @@ Java_akn_main_ImGuiSurface_Shutdown(JNIEnv *env, jclass clazz) {
 }
 
 extern "C"
-JNIEXPORT void JNICALL
-Java_akn_main_ImGuiSurface_MotionEventClick(JNIEnv *env, jclass clazz, jboolean down,
-                                              jfloat pos_x, jfloat pos_y) {
-    if (!g_Initialized) return;
-    ImGuiIO & io = ImGui::GetIO();
-    io.MouseDown[0] = down;
-    io.MousePos = ImVec2(pos_x,pos_y);
-}
-extern "C"
-JNIEXPORT jstring JNICALL
-Java_akn_main_ImGuiSurface_GetWindowCurrent(JNIEnv *env, jclass clazz) {
-    char result[256] = "0|0|0|0";
-    if(g_CurrentWindow){
-        sprintf(result,"%d|%d|%d|%d",(int)g_CurrentWindow->Pos.x,(int)g_CurrentWindow->Pos.y,(int)g_CurrentWindow->Size.x,(int)g_CurrentWindow->Size.y);
-    }
-    return env->NewStringUTF(result);
-}
-extern "C"
 JNIEXPORT jboolean JNICALL
 Java_akn_main_ImGuiSurface_Initialized(JNIEnv *env, jclass clazz) {
     return g_Initialized;
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_akn_main_ImGuiSurface_MotionEvent(JNIEnv *env, jclass clazz, jobject event) {
+    if (!g_Initialized) return;
+
+    jclass cMotionEvent = env->GetObjectClass(event);
+    jmethodID getX = env->GetMethodID(cMotionEvent, "getX", "()F");
+    jmethodID getY = env->GetMethodID(cMotionEvent,"getY", "()F");
+    jmethodID getAction = env->GetMethodID(cMotionEvent, "getAction", "()I");
+
+    auto x = env->CallFloatMethod(event, getX);
+    auto y = env->CallFloatMethod(event, getY);
+    auto action = env->CallIntMethod(event, getAction);
+
+    __android_log_print(ANDROID_LOG_INFO, "GPX", "AC: %i X %.2f Y %.2f", action,x,y);
+
+    ImGui_ImplAndroid_HandleInputEvent((int)x,(int)y,action);
 }

@@ -44,41 +44,7 @@ public class Main {
         gd.setStroke(2,Color.RED);
         mTouch.setBackground(gd);
 
-        mWm.addView(mTouch, mWmParams);
         mWm.addView(imGuiSurface, wParams);
-
-        mTouch.setOnTouchListener((v, event) -> {
-            int action = event.getAction();
-            switch (action) {
-                case MotionEvent.ACTION_MOVE:
-                case MotionEvent.ACTION_DOWN:
-                case MotionEvent.ACTION_UP:
-                    boolean down = action != MotionEvent.ACTION_UP;
-                    ImGuiSurface.MotionEventClick(down, event.getRawX(), event.getRawY());
-                    break;
-                default:
-                    break;
-            }
-            return false;
-        });
-
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    String[] rect = ImGuiSurface.GetWindowCurrent().split("\\|");
-                    mWmParams.x = Integer.parseInt(rect[0]);
-                    mWmParams.y = Integer.parseInt(rect[1]);
-                    mWmParams.width = Integer.parseInt(rect[2]);
-                    mWmParams.height = Integer.parseInt(rect[3]);
-                    mWm.updateViewLayout(mTouch, mWmParams);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                handler.postDelayed(this, 20);
-            }
-        }, 20);
     }
 
     public static WindowManager.LayoutParams getParams(boolean window) {
@@ -93,9 +59,9 @@ public class Main {
             params.flags |= WindowManager.LayoutParams.FLAG_LAYOUT_ATTACHED_IN_DECOR;
         }
 
-        if (window) {
-            params.flags |= WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
-        }
+//        if (window) {
+//            params.flags |= WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
+//        }
         params.format = PixelFormat.RGBA_8888;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             params.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
