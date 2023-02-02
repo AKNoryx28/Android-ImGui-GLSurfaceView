@@ -171,8 +171,6 @@ Java_akn_main_ImGuiSurface_GetWindowsTracked(JNIEnv *env, jclass clazz) {
         ImGuiWindow *window = ImGui::FindWindowByName(window_names[i]);
         if (window == nullptr || !window->Active) continue;
 
-        __android_log_print(ANDROID_LOG_DEBUG, "GPX", "ID:%d A:%i WA:%i H:%i AP:%i M:%i",window->ID, window->Active, window->WasActive,window->Hidden,window->Appearing,window->MemoryCompacted);
-
         ImVec2 &pos = window->Pos;
         ImVec2 &size = window->Size;
         memset(res, '\0', 512);

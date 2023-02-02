@@ -50,6 +50,8 @@ public class Main {
         list_vParams = new WindowManager.LayoutParams[MAX_WINDOW_AMOUNT];
         touchHandlers = new View[MAX_WINDOW_AMOUNT];
 
+        mWm.addView(imGuiSurface, wParams);
+
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
@@ -70,8 +72,6 @@ public class Main {
                         int id = Integer.parseInt(win_idposxy[0]);
                         if (windowRegistered[i] != id || touchHandlers[i] == null) {
                             View view = new View(context);
-                            view.setBackgroundColor(Color.GREEN);
-                            view.setAlpha(0.1f);
                             view.setOnTouchListener((v, e) -> {
                                 int action = e.getAction();
                                 switch (action) {
@@ -89,7 +89,7 @@ public class Main {
                             windowRegistered[i] = id;
                             list_vParams[i] = params;
                             touchHandlers[i] = view;
-                            mWm.addView(view, params);
+                            mWm.addView(touchHandlers[i], list_vParams[i]);
                             continue;
                         }
                         list_vParams[i].x = (int) Float.parseFloat(win_idposxy[1]);
@@ -104,8 +104,6 @@ public class Main {
                 handler.postDelayed(this, 700);
             }
         },700);
-
-        mWm.addView(imGuiSurface, wParams);
     }
 
     public static WindowManager.LayoutParams getParams(boolean window) {
