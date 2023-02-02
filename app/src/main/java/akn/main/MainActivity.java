@@ -2,6 +2,9 @@ package akn.main;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
@@ -11,6 +14,14 @@ public class MainActivity extends Activity {
         Main.RequestOverlayPermission(this);
         setContentView(R.layout.activity_main);
         Main.Start(this);
+
+        Button btn = findViewById(R.id.btn);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this, "Clicked", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     @Override

@@ -8,6 +8,7 @@ import android.opengl.GLSurfaceView;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.Surface;
+import android.view.WindowManager;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -110,7 +111,7 @@ public class ImGuiSurface extends GLSurfaceView implements GLSurfaceView.Rendere
     @Override
     public void onDrawFrame(GL10 gl) {
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
-        Tick();
+        Tick(this);
     }
 
     @Override
@@ -134,7 +135,9 @@ public class ImGuiSurface extends GLSurfaceView implements GLSurfaceView.Rendere
     public static native void Init(AssetManager assetMgr, Surface surface);
     public static native boolean Initialized();
     public static native void SurfaceChanged(GL10 gl, int width, int height);
-    public static native void Tick();
+    public static native void Tick(ImGuiSurface imGuiSurface);
     public static native void Shutdown();
     public static native void MotionEvent(MotionEvent event);
+    public static native void OnTouch(boolean down, float x, float y);
+    public static native String[] GetWindowsTracked();
 }

@@ -4,6 +4,7 @@
 #pragma once
 
 #include <GLES3/gl3.h>
+#include <android/asset_manager.h>
 #include <jni.h>
 #include <EGL/egl.h>
 #include <android/native_window_jni.h>
@@ -16,12 +17,25 @@
 #include "fonts/casncadia_mono.h"
 #include "imgui_internal.h"
 #include <dobby.h>
+#include <vector>
+#include "ImGuiSurface.h"
+#include "AssetsHelper.hpp"
 
-bool g_Initialized, demo;
-jobject g_AssetsManager;
+bool g_Initialized, g_WindowRendered;
+AAssetManager *g_AssetsManager;
 ANativeWindow *g_NativeWindow;
-ImGuiWindow *g_CurrentWindow;
 int screenWidth, screenHeight;
+
+std::vector<const char *> window_names;
+// call this when you make new window
+bool addWindowName(const char *name) {
+    for (auto &n: window_names) {
+        if (n == name) {
+            return false;
+        }
+    }
+    window_names.push_back(name);
+}
 
 extern "C"
 JNIEXPORT void JNICALL
@@ -29,14 +43,15 @@ Java_akn_main_ImGuiSurface_Init(JNIEnv *env, jclass clazz,
                                  jobject asset_mgr, jobject surface) {
     if (g_Initialized) return;
 
-    g_AssetsManager = asset_mgr;
+
+    g_AssetsManager = AAssetManager_fromJava(env, asset_mgr);
     g_NativeWindow = ANativeWindow_fromSurface(env, surface);
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO &io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_IsTouchScreen;
-    io.IniFilename = NULL;
+    io.IniFilename = nullptr;
 
     ImGui::StyleColorsLight();
     ImGui_ImplAndroid_Init(g_NativeWindow);
@@ -70,27 +85,40 @@ Java_akn_main_ImGuiSurface_SurfaceChanged(JNIEnv *env, jclass clazz, jobject gl,
 }
 extern "C"
 JNIEXPORT void JNICALL
-Java_akn_main_ImGuiSurface_Tick(JNIEnv *env, jclass clazz) {
+Java_akn_main_ImGuiSurface_Tick(JNIEnv *env, jclass clazz, jobject thiz) {
     if (!g_Initialized) return;
-
-    ImGuiIO &io = ImGui::GetIO();
 
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplAndroid_NewFrame(screenWidth, screenHeight);
     ImGui::NewFrame();
 
+    static ImGuiWindowFlags windowFlags = ImGuiWindowFlags_AlwaysAutoResize;
 
-    ImGui::Begin("Window");
-    ImGui::Text("FPS %.2f", io.Framerate);
-    g_CurrentWindow = ImGui::GetCurrentWindow();
+    ImGui::Begin("ssss", nullptr, windowFlags);
+    addWindowName("ssss");
+    ImGui::Button("Button");
+    static bool a;
+    ImGui::Checkbox("New Window", &a);
     ImGui::End();
 
-    ImGui::ShowDemoWindow();
+    if (a) {
+        ImGui::Begin("wwwww", &a, windowFlags);
+        addWindowName("wwwww");
+        ImGui::Button("Button");
+        ImGui::End();
+
+        ImGui::ShowDemoWindow(&a);
+        addWindowName("Dear ImGui Demo");
+    }
 
     ImGui::Render();
     glViewport(0, 0, screenWidth, screenHeight);
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+    g_WindowRendered = true;
 }
+
+
 extern "C"
 JNIEXPORT void JNICALL
 Java_akn_main_ImGuiSurface_Shutdown(JNIEnv *env, jclass clazz) {
@@ -108,7 +136,7 @@ Java_akn_main_ImGuiSurface_Shutdown(JNIEnv *env, jclass clazz) {
 extern "C"
 JNIEXPORT jboolean JNICALL
 Java_akn_main_ImGuiSurface_Initialized(JNIEnv *env, jclass clazz) {
-    return g_Initialized;
+    return g_Initialized && g_WindowRendered;
 }
 
 extern "C"
@@ -128,4 +156,35 @@ Java_akn_main_ImGuiSurface_MotionEvent(JNIEnv *env, jclass clazz, jobject event)
     __android_log_print(ANDROID_LOG_INFO, "GPX", "AC: %i X %.2f Y %.2f", action,x,y);
 
     ImGui_ImplAndroid_HandleInputEvent((int)x,(int)y,action);
+}
+extern "C"
+JNIEXPORT jobjectArray JNICALL
+Java_akn_main_ImGuiSurface_GetWindowsTracked(JNIEnv *env, jclass clazz) {
+    if (!g_Initialized || !g_WindowRendered) {
+        return env->NewObjectArray(0, env->FindClass("java/lang/String"),env->NewStringUTF(""));
+    }
+    auto len = window_names.size();
+    static char res[512];
+    jobjectArray rets = env->NewObjectArray((int)len, env->FindClass("java/lang/String"), env->NewStringUTF(""));
+
+    for (int i = 0; i < window_names.size(); i++) {
+        ImGuiWindow *window = ImGui::FindWindowByName(window_names[i]);
+        if (window == nullptr || !window->Active) continue;
+
+        __android_log_print(ANDROID_LOG_DEBUG, "GPX", "ID:%d A:%i WA:%i H:%i AP:%i M:%i",window->ID, window->Active, window->WasActive,window->Hidden,window->Appearing,window->MemoryCompacted);
+
+        ImVec2 &pos = window->Pos;
+        ImVec2 &size = window->Size;
+        memset(res, '\0', 512);
+        sprintf(res, "%d|%.4f|%.4f|%.4f|%.4f", (int)window->ID, pos.x, pos.y, size.x, size.y);
+        env->SetObjectArrayElement(rets, i, env->NewStringUTF(res));
+    }
+    return rets;
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_akn_main_ImGuiSurface_OnTouch(JNIEnv *env, jclass clazz, jboolean down, jfloat x, jfloat y) {
+    ImGuiIO & io = ImGui::GetIO();
+    io.MouseDown[0] = down;
+    io.MousePos = ImVec2(x,y);
 }

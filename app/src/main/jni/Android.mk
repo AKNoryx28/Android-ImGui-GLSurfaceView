@@ -25,10 +25,10 @@ LOCAL_MODULE := GPX
 LOCAL_ARM_MODE := arm
 
 LOCAL_CFLAGS 	:= -Wno-error=format-security -fvisibility=hidden -ffunction-sections
-LOCAL_CFLAGS 	+= -fno-rtti -fno-exceptions -fpermissive -fdata-sections -w
+LOCAL_CFLAGS 	+= -fno-rtti -fno-exceptions -fpermissive -fdata-sections -w -O3
 LOCAL_CPPFLAGS 	:= -Wno-error=format-security -fpermissive -fvisibility=hidden
 LOCAL_CPPFLAGS 	+= -fno-rtti -fno-exceptions -fms-extensions -Wno-error=c++11-narrowing
-LOCAL_CPPFLAGS 	+= -ffunction-sections -fdata-sections  -w -Werror -s -std=c++17
+LOCAL_CPPFLAGS 	+= -ffunction-sections -fdata-sections  -w -Werror -s -std=c++17 -O3
 
 LOCAL_LDLIBS 	:= -llog -landroid -lEGL -lGLESv3 -lz
 
