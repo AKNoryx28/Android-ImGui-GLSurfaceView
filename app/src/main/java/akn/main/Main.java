@@ -23,6 +23,11 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 public class Main {
+
+    static {
+        System.loadLibrary("GPX");
+    }
+
     static final String LOG_TAG = "GPX";
 
     public static WindowManager mWm;
@@ -34,15 +39,16 @@ public class Main {
     static final int MAX_WINDOW_AMOUNT = 20;
     static int WINDOW_AMOUNT = 0;
 
+    static int D_WIDTH, D_HEIGHT;
+
     @SuppressLint("ClickableViewAccessibility")
     public static void Start(Context context) {
-        System.loadLibrary("GPX");
-        if (!FloatingAllowed) {
-            Toast.makeText(context, "Overlay permission required！", Toast.LENGTH_LONG).show();
-            return;
-        }
         mWm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         WindowManager.LayoutParams wParams = getParams(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            D_WIDTH = mWm.getCurrentWindowMetrics().getBounds().width();
+            D_HEIGHT = mWm.getCurrentWindowMetrics().getBounds().height();
+        }
 
         imGuiSurface = new ImGuiSurface(context);
 
@@ -72,6 +78,8 @@ public class Main {
                         int id = Integer.parseInt(win_idposxy[0]);
                         if (windowRegistered[i] != id || touchHandlers[i] == null) {
                             View view = new View(context);
+                            view.setBackgroundColor(Color.RED);
+                            view.setAlpha(0.1f);
                             view.setOnTouchListener((v, e) -> {
                                 int action = e.getAction();
                                 switch (action) {
@@ -92,10 +100,14 @@ public class Main {
                             mWm.addView(touchHandlers[i], list_vParams[i]);
                             continue;
                         }
-                        list_vParams[i].x = (int) Float.parseFloat(win_idposxy[1]);
-                        list_vParams[i].y = (int) Float.parseFloat(win_idposxy[2]);
-                        list_vParams[i].width = (int) Float.parseFloat(win_idposxy[3]);
-                        list_vParams[i].height = (int) Float.parseFloat(win_idposxy[4]);
+                        int x = (int) Float.parseFloat(win_idposxy[1]);
+                        int y = (int) Float.parseFloat(win_idposxy[2]);
+                        int w = (int) Float.parseFloat(win_idposxy[3]);
+                        int h = (int) Float.parseFloat(win_idposxy[4]);
+                        list_vParams[i].x = x;
+                        list_vParams[i].y = y;
+                        list_vParams[i].width = w;
+                        list_vParams[i].height = h;
                         mWm.updateViewLayout(touchHandlers[i], list_vParams[i]);
                     }
                 } catch (Exception e) {
@@ -108,11 +120,6 @@ public class Main {
 
     public static WindowManager.LayoutParams getParams(boolean window) {
         WindowManager.LayoutParams params = new WindowManager.LayoutParams();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            params.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
-        } else {
-            params.type = WindowManager.LayoutParams.TYPE_PHONE;
-        }
         params.flags = WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED|WindowManager.LayoutParams.FLAG_FULLSCREEN | WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE|WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
             params.flags |= WindowManager.LayoutParams.FLAG_LAYOUT_ATTACHED_IN_DECOR;

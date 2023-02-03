@@ -173,6 +173,12 @@ Java_akn_main_ImGuiSurface_GetWindowsTracked(JNIEnv *env, jclass clazz) {
 
         ImVec2 &pos = window->Pos;
         ImVec2 &size = window->Size;
+
+        if (pos.x < 0) pos.x = 0;
+        if (pos.y < 0) pos.y = 0;
+        if (pos.x + size.x > (float)screenWidth) pos.x = (float)screenWidth - size.x;
+        if (pos.y + size.y > (float)screenHeight) pos.y = (float)screenHeight - size.y;
+
         memset(res, '\0', 512);
         sprintf(res, "%d|%.4f|%.4f|%.4f|%.4f", (int)window->ID, pos.x, pos.y, size.x, size.y);
         env->SetObjectArrayElement(rets, i, env->NewStringUTF(res));
