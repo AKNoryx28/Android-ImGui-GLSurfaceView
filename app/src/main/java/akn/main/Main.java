@@ -45,11 +45,6 @@ public class Main {
     public static void Start(Context context) {
         mWm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         WindowManager.LayoutParams wParams = getParams(true);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            D_WIDTH = mWm.getCurrentWindowMetrics().getBounds().width();
-            D_HEIGHT = mWm.getCurrentWindowMetrics().getBounds().height();
-        }
-
         imGuiSurface = new ImGuiSurface(context);
 
         windowRegistered = new int[]{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
@@ -100,14 +95,10 @@ public class Main {
                             mWm.addView(touchHandlers[i], list_vParams[i]);
                             continue;
                         }
-                        int x = (int) Float.parseFloat(win_idposxy[1]);
-                        int y = (int) Float.parseFloat(win_idposxy[2]);
-                        int w = (int) Float.parseFloat(win_idposxy[3]);
-                        int h = (int) Float.parseFloat(win_idposxy[4]);
-                        list_vParams[i].x = x;
-                        list_vParams[i].y = y;
-                        list_vParams[i].width = w;
-                        list_vParams[i].height = h;
+                        list_vParams[i].x = (int) Float.parseFloat(win_idposxy[1]);
+                        list_vParams[i].y = (int) Float.parseFloat(win_idposxy[2]);
+                        list_vParams[i].width = (int) Float.parseFloat(win_idposxy[3]);
+                        list_vParams[i].height = (int) Float.parseFloat(win_idposxy[4]);
                         mWm.updateViewLayout(touchHandlers[i], list_vParams[i]);
                     }
                 } catch (Exception e) {
