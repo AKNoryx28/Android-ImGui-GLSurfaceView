@@ -1,3 +1,6 @@
+# NOTE!
+This project very experimental. before you complains about bug to me, try to fix it first!
+
 ## In your game MainActivity
 ```smali
 # onCreate
