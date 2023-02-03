@@ -39,8 +39,6 @@ public class Main {
     static final int MAX_WINDOW_AMOUNT = 20;
     static int WINDOW_AMOUNT = 0;
 
-    static int D_WIDTH, D_HEIGHT;
-
     @SuppressLint("ClickableViewAccessibility")
     public static void Start(Context context) {
         mWm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
