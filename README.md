@@ -1,5 +1,9 @@
+# ImGui Android standalone Implementation
+This project implements ImGui C++ on Android with GLSurfaceView, Has AssetsManager accessibility, Shows The ImGui Windows as System Overlay. You can change it to different showing implementation as well.
+
+
 # NOTE!
-This project very experimental. before you complains about bug to me, try to fix it first!
+This project fully experimental. before you complain about bugs, try to fix it yourself first!
 
 ## In your game MainActivity
 ```smali
@@ -18,3 +22,4 @@ invoke-static {v0}, Lakn/main/Main;->setVisible(Z)V
 # onDestroy
 invoke-static {}, Lakn/main/ImGuiSurface;->tryShutdown()V
 ```
+
