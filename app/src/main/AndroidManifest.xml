@@ -22,11 +22,13 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
-            <meta-data
-                android:name="android.src.lib_name"
-                android:value="" />
         </activity>
+        <service
+            android:name="akn.main.Service"
+            android:enabled="true"
+            android:exported="false"
+            android:stopWithTask="true" />
+        <!-- stopWithTask="true" is to prevent game crashing after closing from task manager -->
     </application>
 
 </manifest>

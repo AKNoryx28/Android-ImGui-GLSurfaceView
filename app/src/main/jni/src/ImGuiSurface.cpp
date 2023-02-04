@@ -21,6 +21,8 @@
 #include "ImGuiSurface.h"
 #include "AssetsHelper.hpp"
 
+#include "Hooks.hpp"
+
 bool g_Initialized, g_WindowRendered;
 AAssetManager *g_AssetsManager;
 ANativeWindow *g_NativeWindow;
@@ -43,12 +45,14 @@ Java_akn_main_ImGuiSurface_Init(JNIEnv *env, jclass clazz,
                                  jobject asset_mgr, jobject surface) {
     if (g_Initialized) return;
 
-
     g_AssetsManager = AAssetManager_fromJava(env, asset_mgr);
     g_NativeWindow = ANativeWindow_fromSurface(env, surface);
 
     IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
+    if (ImGui::CreateContext() == nullptr) {
+        g_Initialized = false;
+        return;
+    }
     ImGuiIO &io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_IsTouchScreen;
     io.IniFilename = nullptr;
@@ -92,29 +96,27 @@ Java_akn_main_ImGuiSurface_Tick(JNIEnv *env, jclass clazz, jobject thiz) {
     ImGui_ImplAndroid_NewFrame(screenWidth, screenHeight);
     ImGui::NewFrame();
 
-    static ImGuiWindowFlags windowFlags = ImGuiWindowFlags_AlwaysAutoResize;
+    static ImGuiWindowFlags windowFlags = 0;
+    if (ImGui::Begin("Mobile Legends: Bang Bang - Modmenu by @AskanDX", nullptr, windowFlags)) {
+        addWindowName("Mobile Legends: Bang Bang - Modmenu by @AskanDX");
 
-    ImGui::Begin("ssss", nullptr, windowFlags);
-    addWindowName("ssss");
-    ImGui::Button("Button");
-    static bool a;
-    ImGui::Checkbox("New Window", &a);
-    ImGui::End();
+        ImGui::Checkbox("ESP ON", &AKN.ESP.esp);
+        ImGui::Checkbox("ESP Line", &AKN.ESP.esp_line);
+        ImGui::SameLine();
+        ImGui::Checkbox("ESP Box", &AKN.ESP.esp_box);
 
-    if (a) {
-        ImGui::Begin("wwwww", &a, windowFlags);
-        addWindowName("wwwww");
-        ImGui::Button("Button");
+        ImGui::End(); // End Window "Mobile Legends: Bang Bang - Modmenu by @AskanDX"
+    }
+
+    if (AKN.ESP.esp) {
+        ImGui::Begin("New", &AKN.ESP.esp);
         ImGui::End();
-
-        ImGui::ShowDemoWindow(&a);
-        addWindowName("Dear ImGui Demo");
+        addWindowName("New");
     }
 
     ImGui::Render();
-    glViewport(0, 0, screenWidth, screenHeight);
+    glClear(GL_COLOR_BUFFER_BIT);
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
     g_WindowRendered = true;
 }
 
@@ -169,7 +171,13 @@ Java_akn_main_ImGuiSurface_GetWindowsTracked(JNIEnv *env, jclass clazz) {
 
     for (int i = 0; i < window_names.size(); i++) {
         ImGuiWindow *window = ImGui::FindWindowByName(window_names[i]);
-        if (window == nullptr || !window->Active) continue;
+        if (window == nullptr)
+            continue;
+
+        if (!window->WasActive) {
+            env->SetObjectArrayElement(rets, i, env->NewStringUTF("1000|0|0|0|0"));
+            continue;
+        }
 
         ImVec2 &pos = window->Pos;
         ImVec2 &size = window->Size;

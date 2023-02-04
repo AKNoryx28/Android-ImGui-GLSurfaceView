@@ -11,7 +11,7 @@ android {
         minSdk 19
         targetSdk 33
         versionCode 1
-        versionName "1.0"
+        versionName "2.0"
         externalNativeBuild {
             ndkBuild {
                 cppFlags '-std=c++17'

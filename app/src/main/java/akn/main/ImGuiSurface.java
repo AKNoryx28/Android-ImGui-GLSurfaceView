@@ -110,7 +110,6 @@ public class ImGuiSurface extends GLSurfaceView implements GLSurfaceView.Rendere
      */
     @Override
     public void onDrawFrame(GL10 gl) {
-        gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
         Tick(this);
     }
 

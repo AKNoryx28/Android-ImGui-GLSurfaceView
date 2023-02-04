@@ -8,18 +8,22 @@ This project fully experimental. before you complain about bugs, try to fix it y
 ## In your game MainActivity
 ```smali
 # onCreate
-invoke-static {p0}, Lakn/main/Main;->RequestOverlayPermission(Landroid/app/Activity;)V
 invoke-static {p0}, Lakn/main/Main;->Start(Landroid/content/Context;)V
-
-# onPause
-const/4 v0, 0x0
-invoke-static {v0}, Lakn/main/Main;->setVisible(Z)V
-
-# onResume
-const/4 v0, 0x1
-invoke-static {v0}, Lakn/main/Main;->setVisible(Z)V
-
-# onDestroy
-invoke-static {}, Lakn/main/ImGuiSurface;->tryShutdown()V
+```
+## `AndroidManifest.xml`
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <application>
+        ...
+    <service
+        android:name="akn.main.Service"
+        android:enabled="true"
+        android:exported="false"
+        android:stopWithTask="true" />
+        ...
+    </application>
+</manifest>
 ```
 
