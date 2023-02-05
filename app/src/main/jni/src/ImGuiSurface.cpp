@@ -74,7 +74,6 @@ Java_akn_main_ImGuiSurface_Init(JNIEnv *env, jclass clazz,
     style.GrabRounding = 5.0f; 
 
     g_Initialized = true;
-
 }
 extern "C"
 JNIEXPORT void JNICALL
@@ -97,23 +96,37 @@ Java_akn_main_ImGuiSurface_Tick(JNIEnv *env, jclass clazz, jobject thiz) {
     ImGui::NewFrame();
 
     static ImGuiWindowFlags windowFlags = 0;
-    if (ImGui::Begin("Mobile Legends: Bang Bang - Modmenu by @AskanDX", nullptr, windowFlags)) {
-        addWindowName("Mobile Legends: Bang Bang - Modmenu by @AskanDX");
+    if (ImGui::Begin("Window Title", nullptr, windowFlags)) {
+        addWindowName("Window Title");
 
         ImGui::Checkbox("ESP ON", &AKN.ESP.esp);
         ImGui::Checkbox("ESP Line", &AKN.ESP.esp_line);
         ImGui::SameLine();
         ImGui::Checkbox("ESP Box", &AKN.ESP.esp_box);
+        ImGui::SameLine();
+        ImGui::Checkbox("ESP Health", &AKN.ESP.esp_health);
+        ImGui::Checkbox("ESP Name", &AKN.ESP.esp_name);
 
-        ImGui::End(); // End Window "Mobile Legends: Bang Bang - Modmenu by @AskanDX"
+        ImGui::Checkbox("Imgui Demo Window", &AKN.hooksComplete);
+
+        ImGui::End(); // End Window "Window Title"
+    }
+
+    if (AKN.hooksComplete) {
+        ImGui::ShowDemoWindow(&AKN.hooksComplete);
+        addWindowName("Dear ImGui Demo");
     }
 
     if (AKN.ESP.esp) {
-        ImGui::Begin("New", &AKN.ESP.esp);
-        ImGui::End();
-        addWindowName("New");
+        static ImDrawList *bg = ImGui::GetBackgroundDrawList();
+        if (!bg) goto render;
+
+        bg->AddCircle(ImVec2((float)screenWidth/2,(float)screenHeight/2),
+                      10.0f,ImColor(1.0f,1.0f,1.0f),
+                      0, 3.0f);
     }
 
+render:
     ImGui::Render();
     glClear(GL_COLOR_BUFFER_BIT);
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

@@ -9,24 +9,25 @@ import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 
-import java.util.Objects;
 
 public class Service extends android.app.Service {
+
+    static final int MAX_WINDOW_AMOUNT = 20;
+
+    static {
+        System.loadLibrary("GPX");
+    }
 
     int[] windowRegistered;
     WindowManager.LayoutParams[] touchHandlerParams;
     View[] touchHandlers;
-
     ImGuiSurface imGuiSurface;
     WindowManager windowManager;
-
-    static final int MAX_WINDOW_AMOUNT = 20;
 
     @Override
     public void onCreate() {
@@ -57,7 +58,7 @@ public class Service extends android.app.Service {
         }
 
         WindowManager.LayoutParams params = getParams(true);
-        windowManager = Main.wm;
+        windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         windowManager.addView(imGuiSurface, params);
 
         final Handler handlerUpdateTouchView = new Handler();
@@ -130,7 +131,12 @@ public class Service extends android.app.Service {
 
     public WindowManager.LayoutParams getParams(boolean window) {
         WindowManager.LayoutParams params = new WindowManager.LayoutParams();
-        params.flags = WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED|WindowManager.LayoutParams.FLAG_FULLSCREEN | WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE|WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            params.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+        } else {
+            params.type = WindowManager.LayoutParams.TYPE_PHONE;
+        }
+        params.flags = WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED | WindowManager.LayoutParams.FLAG_FULLSCREEN | WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
             params.flags |= WindowManager.LayoutParams.FLAG_LAYOUT_ATTACHED_IN_DECOR;
         }
@@ -191,6 +197,7 @@ public class Service extends android.app.Service {
             imGuiSurface.setVisibility(View.VISIBLE);
         }
     }
+
     @Override
     public IBinder onBind(Intent intent) {
         return null;

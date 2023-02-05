@@ -14,6 +14,8 @@ struct MODS {
         bool esp;
         bool esp_line;
         bool esp_box;
+        bool esp_name;
+        bool esp_health;
     }ESP;
 }AKN;
 

@@ -8,7 +8,6 @@ import android.opengl.GLSurfaceView;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.Surface;
-import android.view.WindowManager;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -24,7 +23,7 @@ public class ImGuiSurface extends GLSurfaceView implements GLSurfaceView.Rendere
      */
     public ImGuiSurface(Context context) {
         super(context);
-        setEGLConfigChooser(8,8,8,8,16,0);
+        setEGLConfigChooser(8, 8, 8, 8, 16, 0);
         getHolder().setFormat(PixelFormat.TRANSLUCENT);
         setEGLContextClientVersion(3);
         setRenderer(this);
@@ -33,6 +32,27 @@ public class ImGuiSurface extends GLSurfaceView implements GLSurfaceView.Rendere
             Log.e("IMGUI_JAVA", "getAssets() failed return null!");
         }
     }
+
+    public static void tryShutdown() {
+        if (Initialized())
+            Shutdown();
+    }
+
+    public static native void Init(AssetManager assetMgr, Surface surface);
+
+    public static native boolean Initialized();
+
+    public static native void SurfaceChanged(GL10 gl, int width, int height);
+
+    public static native void Tick(ImGuiSurface imGuiSurface);
+
+    public static native void Shutdown();
+
+    public static native void MotionEvent(MotionEvent event);
+
+    public static native void OnTouch(boolean down, float x, float y);
+
+    public static native String[] GetWindowsTracked();
 
     /**
      * Called when the surface is created or recreated.
@@ -119,24 +139,10 @@ public class ImGuiSurface extends GLSurfaceView implements GLSurfaceView.Rendere
         tryShutdown();
     }
 
-    public static void tryShutdown() {
-        if (Initialized())
-            Shutdown();
-    }
-
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         MotionEvent(event);
         return super.onTouchEvent(event);
     }
-
-    public static native void Init(AssetManager assetMgr, Surface surface);
-    public static native boolean Initialized();
-    public static native void SurfaceChanged(GL10 gl, int width, int height);
-    public static native void Tick(ImGuiSurface imGuiSurface);
-    public static native void Shutdown();
-    public static native void MotionEvent(MotionEvent event);
-    public static native void OnTouch(boolean down, float x, float y);
-    public static native String[] GetWindowsTracked();
 }
